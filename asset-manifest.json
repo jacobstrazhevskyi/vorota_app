@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.js": "/static/js/main.cc778d6e.js",
-    "index.html": "/index.html",
-    "main.cc778d6e.js.map": "/static/js/main.cc778d6e.js.map"
+    "main.js": "/vorota_app/static/js/main.cc778d6e.js",
+    "index.html": "/vorota_app/index.html",
+    "main.cc778d6e.js.map": "/vorota_app/static/js/main.cc778d6e.js.map"
   },
   "entrypoints": [
     "static/js/main.cc778d6e.js"
