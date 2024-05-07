@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import {
   Box,
-  Button,
+  CircularProgress,
+  Typography,
   styled,
 } from '@mui/material';
+
+import { buttonsNames } from '../../aux/buttonsNames';
+import { ContainedButton } from '../ContainedButton';
+
+import { possiblePorts } from '../../aux/possiblePorts';
 
 const StyledBox = styled(Box)({
   width: '100%',
@@ -15,32 +21,42 @@ const StyledBox = styled(Box)({
   marginTop: '100px',
 });
 
-export const AppContent: React.FC = () => (
-  <StyledBox>
-    <Button
-      variant="contained"
-    >
-      Ворота стоянки, возле дороги
-    </Button>
-    <Button
-      variant="contained"
-    >
-      Ворота стоянки, дальние
-    </Button>
-    <Button
-      variant="contained"
-    >
-      Ворота здания
-    </Button>
-    <Button
-      variant="contained"
-    >
-      Дверь здания
-    </Button>
-    <Button
-      variant="contained"
-    >
-      Дверь стоянки
-    </Button>
-  </StyledBox>
-);
+export const AppContent: React.FC = () => {
+  const [serverIp, setServerIp] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [possiblePortsArrayIndex, setPossiblePortsArrayIndex] = useState(0);
+  const [loadingError, setLoadingError] = useState(false);
+
+  useEffect(() => {
+    const responseIp = `http://${possiblePorts[possiblePortsArrayIndex]}`;
+    fetch(responseIp);
+    // fetch(responseIp)
+    //   .then(response => {
+    //     if (response.) {
+
+    //     }
+    //   });
+  }, [possiblePortsArrayIndex]);
+
+  return (
+    <StyledBox>
+      {!loading && buttonsNames.map((name, index) => (
+        <ContainedButton
+          key={index}
+        >
+          {name}
+        </ContainedButton>
+      ))}
+
+      {loading && <CircularProgress />}
+
+      {loadingError && (
+        <Typography
+          color="red"
+        >
+          Loading error
+        </Typography>
+      )}
+    </StyledBox>
+  )
+};
