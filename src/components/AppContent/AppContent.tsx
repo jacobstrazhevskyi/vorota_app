@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import {
   Box,
-  CircularProgress,
+  LinearProgress,
   Typography,
   styled,
 } from '@mui/material';
@@ -20,11 +20,68 @@ const StyledBox = styled(Box)({
   marginTop: '100px',
 });
 
+const StyledLinearProgress = styled(LinearProgress)({
+  width: '100%',
+});
+
+type CheckButtonStateProps = {
+  index: number,
+  pin: number,
+};
+
 export const AppContent: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [loadingError, setLoadingError] = useState(false);
 
+  const [buttonsStates, setButtonsStates] = useState([
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
+
+  const [buttonsDisabled, setButtonsDisabled] = useState([
+    false,
+    false,
+    false,
+    false,
+    false,
+  ]);
+
+  console.log(buttonsDisabled);
+
   const [pins, setPins] = useState<number[]>([]);
+
+  const checkButtonState = ({
+    index,
+    pin,
+  }: CheckButtonStateProps) => {
+    fetch(`${SERVER_IP}/get_state?pin={${pin}}`)
+      .then(response => response.json())
+      .then(data => {
+        const newButtonsState = buttonsStates;
+        newButtonsState[index] = data;
+
+        setButtonsStates(newButtonsState);
+      });
+  };
+
+  const handleDisabled = (index: number) => {
+    console.log(buttonsDisabled);
+
+    const newButtonsDisabled = buttonsDisabled;
+    newButtonsDisabled[index] = true;
+
+    setButtonsDisabled(newButtonsDisabled);
+
+    setTimeout(() => {
+      const newButtonsDisabled = buttonsDisabled;
+      newButtonsDisabled[index] = false;
+
+      setButtonsDisabled(newButtonsDisabled);
+    }, 1000);
+  };
 
   console.log(pins);
 
@@ -55,20 +112,40 @@ export const AppContent: React.FC = () => {
 
   return (
     <StyledBox>
-      {!loading && buttonsNames.map((name, index) => (
-        <ContainedButton
-          key={index}
-          onClick={() => {
-            const pin = pins[index];
+      {!loading && !loadingError && buttonsNames.map((name, index) => (
+        <>
+          {/* {buttonsStates[index] ? <Typography>Открыты</Typography> : <Typography>Закрыты</Typography>} */}
+          <ContainedButton
+            disabled={buttonsDisabled[index]}
+            key={index}
+            onClick={() => {
 
-            fetch(`${SERVER_IP}/generate_impulse?pin=${pin}`);
-          }}
-        >
-          {name}
-        </ContainedButton>
+              handleDisabled(index);
+
+              const pin = pins[index];
+              fetch(`${SERVER_IP}/generate_impulse?pin=${pin}`);
+
+
+              // checkButtonState({ pin, index });
+            }}
+          >
+            {name}
+          </ContainedButton>
+        </>
       ))}
 
-      {loading && <CircularProgress />}
+      {loading && (
+        <StyledLinearProgress />
+      )}
+
+      {loadingError && (
+        <Typography
+          color="red"
+          fontSize={24}
+        >
+          Loading error
+        </Typography>
+      )}
     </StyledBox>
   )
 };
